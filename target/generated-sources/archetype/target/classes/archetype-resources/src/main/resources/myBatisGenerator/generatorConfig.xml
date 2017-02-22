@@ -1,0 +1,71 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+	<classPathEntry location="./src/main/resources/myBatisGenerator/jdbc-3.0.jar" />
+	<context id="DB2Tables" targetRuntime="MyBatis3">
+		<commentGenerator>
+			<property name="suppressDate" value="true" />
+			<!-- 去除自动生成的注释 -->
+			<property name="suppressAllComments" value="true" />
+		</commentGenerator>
+
+		<jdbcConnection driverClass="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+			connectionURL="jdbc:sqlserver://127.0.0.1:1433;databaseName=cmcc"
+			userId="sa" password="1">
+		</jdbcConnection>
+
+
+		<!-- 数据库字段类型Decimal、Numeric转换到BigDecimal -->
+		<javaTypeResolver>
+			<property name="forceBigDecimals" value="true" />
+		</javaTypeResolver>
+
+		<javaModelGenerator targetPackage="${package}.model"
+			targetProject="./src/main/java">
+			<!-- 包名增加schema -->
+			<property name="enableSubPackages" value="false" />
+			<!--string前后去空格 -->
+			<property name="trimStrings" value="true" />
+		</javaModelGenerator>
+
+		<sqlMapGenerator targetPackage="${package}.dao"
+			targetProject="./src/main/resources">
+			<property name="enableSubPackages" value="false" />
+		</sqlMapGenerator>
+
+
+		<!-- 生成DAO接口 -->
+		<javaClientGenerator type="XMLMAPPER"
+			targetPackage="${package}.dao" targetProject="./src/main/java">
+			<property name="enableSubPackages" value="false" />
+		</javaClientGenerator>
+
+		<!-- domainObjectName model名，package为${symbol_dollar}{javaModelGenerator.targetPackage}.${symbol_dollar}{domainObjectName} 
+			mapperName -->
+		<!--<table tableName="tc_aliexpress_warehouse_bill" domainObjectName="bill.AliExpressWarehouseBill" -->
+		<!--mapperName="AliExpressWarehouseBillMapper"> -->
+		<!--</table> -->
+		<!--<table tableName="tc_aliexpress_line_bill" domainObjectName="bill.AliExpressLineBill" -->
+		<!--mapperName="AliExpressLineBillMapper"> -->
+		<!--</table> -->
+		<!--<table tableName="tc_aliexpress_delivery_bill" domainObjectName="bill.AliExpressDeliveryBill" -->
+		<!--mapperName="AliExpressDeliveryBillMapper"> -->
+		<!--</table> -->
+
+		<!--<table tableName="tc_aliexpress_customs_bill" domainObjectName="bill.AliExpressCustomsBill" -->
+		<!--mapperName="AliExpressCustomsBillMapper"> -->
+		<!--</table> -->
+		<!-- <table tableName="tc_aliexpress_bill_compare_detail"
+			domainObjectName="bill.AliExpressBillCompareDetail" mapperName="AliExpressBillCompareDetailMapper">
+		</table> -->
+		<table tableName="aliexpress_import_exception"
+			domainObjectName="AliExpressImportException" mapperName="AliExpressImportExceptionMapper">
+		</table>
+	</context>
+</generatorConfiguration>

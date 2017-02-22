@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="importLineBillJob" class="it.pkg.service.TestDemoListener" />
+
+	<bean id="importLineBillJobMethod"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="importLineBillJob" />
+		<property name="targetMethod" value="execute" />
+	</bean>
+
+	<bean id="cronTriggerBean"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="importLineBillJobMethod" />
+		<!--每隔三十分钟一次 -->
+		<property name="cronExpression" value="0 0/1 * * * ?" />
+	</bean>
+
+	<bean id="springJobSchedulerFactoryBean" lazy-init="false"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="cronTriggerBean" />
+			</list>
+		</property>
+
+		<!-- 是否自动启动 -->
+		<property name="autoStartup" value="true" />
+		<!-- 启动时延期开始任务(秒) -->
+		<property name="startupDelay" value="0" />
+
+	</bean>
+</beans>

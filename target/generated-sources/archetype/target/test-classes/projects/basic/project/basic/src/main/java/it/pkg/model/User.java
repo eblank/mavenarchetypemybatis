@@ -1,4 +1,4 @@
-package com.hurry.model;
+package it.pkg.model;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

@@ -1,6 +1,6 @@
-package com.hurry.web;
+package it.pkg.web;
 
-import com.hurry.model.User;
+import it.pkg.model.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;

@@ -1,0 +1,110 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean
+		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath*:jdbc.properties</value>
+			</list>
+		</property>
+		<property name="fileEncoding">
+			<value>UTF-8</value>
+		</property>
+	</bean>
+
+	<bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter">
+		<property name="slowSqlMillis" value="10000" />
+		<property name="logSlowSql" value="true" />
+		<property name="mergeSql" value="true" />
+	</bean>
+
+	<!-- 定制log日志输出内容 -->
+	<bean id="log-filter" class="com.alibaba.druid.filter.logging.Slf4jLogFilter">
+		<!-- 关闭输出sql执行结果 -->
+		<property name="resultSetLogEnabled" value="false" />
+		<!-- 关闭连接信息 -->
+		<property name="connectionLogEnabled" value="false" />
+		<!-- 关闭数据源日志 -->
+		<property name="dataSourceLogEnabled" value="false" />
+		<!-- 输出执行的sql -->
+		<property name="statementExecutableSqlLogEnable" value="true" />
+	</bean>
+
+	<!--数据源 -->
+	<bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<!--<property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/> -->
+		<property name="url" value="${symbol_dollar}{datasource.url}" />
+		<property name="username" value="${symbol_dollar}{datasource.username}" />
+		<property name="password" value="${symbol_dollar}{datasource.password}" />
+
+		<!-- 初始化连接大小 -->
+		<property name="initialSize" value="0" />
+		<!-- 连接池最大使用连接数量 -->
+		<property name="maxActive" value="20" />
+		<!-- 连接池最小空闲 -->
+		<property name="minIdle" value="0" />
+		<!-- 获取连接最大等待时间 -->
+		<property name="maxWait" value="60000" />
+
+		<!-- <property name="poolPreparedStatements" value="true" /> <property 
+			name="maxPoolPreparedStatementPerConnectionSize" value="33" /> -->
+
+		<property name="validationQuery" value="SELECT 1" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="testWhileIdle" value="true" />
+
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="25200000" />
+
+		<!-- 打开removeAbandoned功能 -->
+		<property name="removeAbandoned" value="true" />
+		<!-- 1800秒，也就是30分钟 -->
+		<property name="removeAbandonedTimeout" value="1800" />
+		<!-- 关闭abanded连接时输出错误日志 -->
+		<property name="logAbandoned" value="true" />
+
+		<!-- 防御SQL注入攻击 监控数据库 -->
+		<!-- <property name="filters" value="mergeStat" /> -->
+		<property name="filters" value="wall,stat,log4j" />
+		<property name="connectionProperties" value="druid.stat.mergeSql=true" />
+
+		<!--是的DruidDataSource无法正确识别数据库的类型 -->
+		<property name="proxyFilters">
+			<list>
+				<ref bean="stat-filter" />
+			</list>
+		</property>
+
+	</bean>
+
+	<!--sqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:mybatis.xml" />
+		<!--Mapper.xml文件放在资源文件里 与model相同包 -->
+		<property name="mapperLocations" value="classpath*:${package}.dao/*Mapper.xml" />
+	</bean>
+
+	<!--sqlSession -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+
+	<!--扫描mapper -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="${package}.dao" />
+		<!--多数据源必须加上 如连接池 -->
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+		<!--<property name="sqlSessionFactory" ref="sqlSessionFactory"/> -->
+	</bean>
+</beans>
